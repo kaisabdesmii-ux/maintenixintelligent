@@ -38,9 +38,9 @@ function Preventive() {
 
   async function generate(p: any) {
     const { error } = await supabase.from("work_orders").insert({ equipment_id: p.equipment_id, plan_id: p.id, type: "preventive", description: `${p.title} — ${p.checklist ?? ""}`, status: "scheduled", planned_date: p.next_due, priority: state(p) === "overdue" ? "high" : "medium" });
-    if (error) return toast.error(error.message.includes("row-level") ? "Your role is not allowed to do this." : error.message);
+    if (error) return void toast.error(error.message.includes("row-level") ? "Your role is not allowed to do this." : error.message);
     const { error: e2 } = await supabase.from("preventive_plans").update({ last_done: today, next_due: addDays(today, p.interval_days) }).eq("id", p.id);
-    if (e2) return toast.error(e2.message);
+    if (e2) return void toast.error(e2.message);
     toast.success("Work order generated, next due " + addDays(today, p.interval_days));
     qc.invalidateQueries({ queryKey: ["preventive_plans"] }); qc.invalidateQueries({ queryKey: ["work_orders"] });
   }
@@ -50,7 +50,7 @@ function Preventive() {
     <div>
       <PageHeader title="Preventive Maintenance" subtitle="Generate work orders from plans; the next due date rolls forward automatically."
         actions={me?.can(PERMS.preventive) && <FormDialog title="New preventive plan" fields={fields} initial={{ frequency: "monthly", next_due: today }}
-          onSubmit={(v) => save.mutateAsync({ values: { ...v, interval_days: FREQ.find(([f]) => f === v.frequency)?.[1] ?? 30 } })}
+          onSubmit={(v) => save.mutateAsync({ values: { ...v, interval_days: FREQ.find(([f]) => f === v["frequency"])?.[1] ?? 30 } })}
           trigger={<Button><Plus className="h-4 w-4" />New plan</Button>} />} />
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         <KpiCard label="Active plans" value={rows.filter((p) => p.active).length} icon={CalendarClock} />

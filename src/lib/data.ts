@@ -24,7 +24,7 @@ export function useRows<T extends TableName>(table: T, opts: { select?: string; 
 export function useSave<T extends TableName>(table: T, invalidate: TableName[] = []) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, values }: { id?: string; values: Record<string, unknown> }) => {
+    mutationFn: async ({ id, values }: { id?: string | undefined; values: Record<string, unknown> }) => {
       const res = id
         ? await (supabase.from(table) as any).update(values).eq("id", id)
         : await (supabase.from(table) as any).insert(values);

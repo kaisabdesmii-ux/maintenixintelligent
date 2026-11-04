@@ -14,7 +14,7 @@ export type Field = {
   full?: boolean;
 };
 
-export function FormDialog({ title, fields, initial = {}, onSubmit, trigger }: { title: string; fields: Field[]; initial?: Record<string, any>; onSubmit: (v: Record<string, any>) => Promise<void>; trigger: ReactNode }) {
+export function FormDialog({ title, fields, initial = {}, onSubmit, trigger }: { title: string; fields: Field[]; initial?: Record<string, any>; onSubmit: (v: any) => Promise<void>; trigger: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   return (

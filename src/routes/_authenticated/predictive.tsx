@@ -49,16 +49,16 @@ function Predictive() {
 
   async function importCsv(file: File) {
     const text = await file.text();
-    const [head, ...lines] = text.trim().split(/\r?\n/);
+    const [head = "", ...lines] = text.trim().split(/\r?\n/);
     const cols = head.split(",").map((c) => c.trim());
     const byCode = new Map((eq.data ?? []).map((e) => [e.code, e.id]));
     const rows = lines.map((l) => Object.fromEntries(l.split(",").map((v, i) => [cols[i], v.trim()]))).map((r: any) => ({
       equipment_id: byCode.get(r.equipment_code), recorded_at: r.recorded_at || new Date().toISOString(),
       temperature: r.temperature ? +r.temperature : null, vibration: r.vibration ? +r.vibration : null, pressure: r.pressure ? +r.pressure : null, current_a: r.current_a ? +r.current_a : null,
     })).filter((r) => r.equipment_id);
-    if (!rows.length) return toast.error("No valid rows. Expected columns: equipment_code,recorded_at,temperature,vibration,pressure,current_a");
+    if (!rows.length) return void toast.error("No valid rows. Expected columns: equipment_code,recorded_at,temperature,vibration,pressure,current_a");
     const { error } = await supabase.from("sensor_readings").insert(rows as any);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     toast.success(`${rows.length} readings imported`);
     qc.invalidateQueries({ queryKey: ["sensor_readings"] });
   }

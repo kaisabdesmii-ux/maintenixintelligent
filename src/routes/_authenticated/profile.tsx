@@ -25,7 +25,7 @@ function Profile() {
           e.preventDefault();
           const fd = new FormData(e.currentTarget);
           const { error } = await supabase.from("profiles").update({ full_name: String(fd.get("full_name")), department: String(fd.get("department")), specialty: String(fd.get("specialty")) }).eq("id", me.user.id);
-          if (error) return toast.error(error.message);
+          if (error) return void toast.error(error.message);
           toast.success("Profile updated"); qc.invalidateQueries({ queryKey: ["me"] });
         }}>
           <div><Label htmlFor="full_name">Full name</Label><Input id="full_name" name="full_name" defaultValue={me.profile?.full_name ?? ""} className="mt-1.5" /></div>

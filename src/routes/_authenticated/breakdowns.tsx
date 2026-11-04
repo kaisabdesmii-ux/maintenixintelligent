@@ -56,7 +56,7 @@ function Breakdowns() {
         actions={me?.can(PERMS.breakdownReport) && <FormDialog title="Report a breakdown" fields={report}
           initial={{ occurred_at: new Date().toISOString().slice(0, 16), severity: "medium", priority: "medium", failure_category: "Mechanical" }}
           onSubmit={async (v) => {
-            await save.mutateAsync({ values: { ...v, occurred_at: new Date(v.occurred_at).toISOString(), reported_by: me.user.id, reporter_name: me.profile?.full_name } });
+            await save.mutateAsync({ values: { ...v, occurred_at: new Date(v["occurred_at"]).toISOString(), reported_by: me.user.id, reporter_name: me.profile?.full_name } });
           }}
           trigger={<Button variant="destructive"><Plus className="h-4 w-4" />Report breakdown</Button>} />} />
 
@@ -80,7 +80,7 @@ function Breakdowns() {
           { key: "act", label: "", render: (r) => me?.can(PERMS.breakdownUpdate) && (
             <span onClick={(e) => e.stopPropagation()}>
               <FormDialog title={`Update ${r.reference}`} fields={manage} initial={{ ...r, occurred_at: r.occurred_at.slice(0, 16) }}
-                onSubmit={async (v) => { const { equipment, ...rest } = v; await save.mutateAsync({ id: r.id, values: { ...rest, occurred_at: new Date(v.occurred_at).toISOString() } }); }}
+                onSubmit={async (v) => { const { equipment, ...rest } = v; await save.mutateAsync({ id: r.id, values: { ...rest, occurred_at: new Date(v["occurred_at"]).toISOString() } }); }}
                 trigger={<Button size="icon" variant="ghost" aria-label="Edit"><Pencil className="h-4 w-4" /></Button>} />
             </span>) },
         ]} />

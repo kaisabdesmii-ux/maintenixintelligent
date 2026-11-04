@@ -25,12 +25,12 @@ function Users() {
 
   async function add(userId: string, role: AppRole) {
     const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["users-admin"] });
   }
   async function remove(id: string) {
     const { error } = await supabase.from("user_roles").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) return void toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["users-admin"] });
   }
 

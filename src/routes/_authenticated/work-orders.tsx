@@ -38,8 +38,8 @@ function WorkOrders() {
     { name: "work_performed", label: "Work performed", type: "textarea" }, { name: "comments", label: "Technician comments", type: "textarea" },
   ];
   const canEdit = me?.can(PERMS.workOrders);
-  const onSave = (id?: string) => async (v: Record<string, any>) => {
-    const values = { ...v };
+  const onSave = (id?: string) => async (v: any) => {
+    const values: any = { ...v };
     if (v.status === "in_progress") values.start_date = new Date().toISOString();
     if (v.status === "completed") values.end_date = new Date().toISOString();
     await save.mutateAsync({ id, values });
