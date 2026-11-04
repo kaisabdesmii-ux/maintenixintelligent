@@ -55,6 +55,17 @@ export function riskLevel(score: number): "low" | "medium" | "high" {
   return "low";
 }
 
+/** OEE = availability × performance × quality (0..1). Performance/quality are planning assumptions until production counters exist. */
+export const OEE_ASSUMPTIONS = { performance: 0.92, quality: 0.98 };
+export function oee(avail: number, performance = OEE_ASSUMPTIONS.performance, quality = OEE_ASSUMPTIONS.quality): number {
+  return Math.max(0, Math.min(1, avail * performance * quality));
+}
+
+/** Equipment health badge = 100 - predictive risk score. */
+export function healthScore(risk: number): number {
+  return Math.max(0, 100 - Math.round(risk));
+}
+
 export const fmt = {
   num: (n: number, d = 0) => n.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d }),
   money: (n: number) => "$" + Math.round(n).toLocaleString("en-US"),
