@@ -1,24 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
+import { AuthScreen } from "@/components/auth-card";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  ssr: false,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) throw redirect({ to: "/dashboard" });
+  },
+  head: () => ({
+    meta: [
+      { title: "Maintenix Intelligent — Smart Maintenance Platform" },
+      { name: "description", content: "Sign in to Maintenix Intelligent, the GMAO 4.0 platform for industrial maintenance teams." },
+      { property: "og:title", content: "Maintenix Intelligent — Smart Maintenance Platform" },
+      { property: "og:description", content: "GMAO 4.0: equipment, breakdowns, work orders, inventory and predictive maintenance." },
+    ],
+  }),
+  component: AuthScreen,
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
