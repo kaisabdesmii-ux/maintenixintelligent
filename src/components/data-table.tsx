@@ -27,7 +27,7 @@ export function DataTable<T extends Record<string, any>>({ rows, cols, loading, 
           </thead>
           <tbody>
             {list.map((r, i) => (
-              <tr key={r.id ?? i} onClick={() => onRowClick?.(r)} className={"border-b last:border-0 hover:bg-muted/40 " + (onRowClick ? "cursor-pointer" : "")}>
+              <tr key={r["id"] ?? i} onClick={() => onRowClick?.(r)} className={"border-b last:border-0 hover:bg-muted/40 " + (onRowClick ? "cursor-pointer" : "")}>
                 {cols.map((c) => <td key={c.key} className={"px-3 py-2.5 " + (c.className ?? "")}>{c.render ? c.render(r) : String(r[c.key] ?? "—")}</td>)}
               </tr>
             ))}

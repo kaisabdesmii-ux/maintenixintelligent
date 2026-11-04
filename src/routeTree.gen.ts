@@ -13,7 +13,15 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedBreakdownsRouteImport } from './routes/_authenticated/breakdowns'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
+import { Route as AuthenticatedPredictiveRouteImport } from './routes/_authenticated/predictive'
+import { Route as AuthenticatedPreventiveRouteImport } from './routes/_authenticated/preventive'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedReliabilityRouteImport } from './routes/_authenticated/reliability'
+import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
+import { Route as AuthenticatedWorkOrdersRouteImport } from './routes/_authenticated/work-orders'
 import { Route as AuthenticatedEquipmentIndexRouteImport } from './routes/_authenticated/equipment.index'
 import { Route as AuthenticatedEquipmentIdRouteImport } from './routes/_authenticated/equipment.$id'
 
@@ -36,9 +44,50 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedBreakdownsRoute = AuthenticatedBreakdownsRouteImport.update({
+  id: '/breakdowns',
+  path: '/breakdowns',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPredictiveRoute = AuthenticatedPredictiveRouteImport.update({
+  id: '/predictive',
+  path: '/predictive',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPreventiveRoute = AuthenticatedPreventiveRouteImport.update({
+  id: '/preventive',
+  path: '/preventive',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReliabilityRoute =
+  AuthenticatedReliabilityRouteImport.update({
+    id: '/reliability',
+    path: '/reliability',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWorkOrdersRoute = AuthenticatedWorkOrdersRouteImport.update({
+  id: '/work-orders',
+  path: '/work-orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedEquipmentIndexRoute =
@@ -58,7 +107,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/breakdowns': typeof AuthenticatedBreakdownsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
+  '/predictive': typeof AuthenticatedPredictiveRoute
+  '/preventive': typeof AuthenticatedPreventiveRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/reliability': typeof AuthenticatedReliabilityRoute
+  '/users': typeof AuthenticatedUsersRoute
+  '/work-orders': typeof AuthenticatedWorkOrdersRoute
   '/equipment/$id': typeof AuthenticatedEquipmentIdRoute
   '/equipment/': typeof AuthenticatedEquipmentIndexRoute
 }
@@ -66,7 +123,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/breakdowns': typeof AuthenticatedBreakdownsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/inventory': typeof AuthenticatedInventoryRoute
+  '/predictive': typeof AuthenticatedPredictiveRoute
+  '/preventive': typeof AuthenticatedPreventiveRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/reliability': typeof AuthenticatedReliabilityRoute
+  '/users': typeof AuthenticatedUsersRoute
+  '/work-orders': typeof AuthenticatedWorkOrdersRoute
   '/equipment/$id': typeof AuthenticatedEquipmentIdRoute
   '/equipment': typeof AuthenticatedEquipmentIndexRoute
 }
@@ -76,7 +141,15 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/breakdowns': typeof AuthenticatedBreakdownsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
+  '/_authenticated/predictive': typeof AuthenticatedPredictiveRoute
+  '/_authenticated/preventive': typeof AuthenticatedPreventiveRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/reliability': typeof AuthenticatedReliabilityRoute
+  '/_authenticated/users': typeof AuthenticatedUsersRoute
+  '/_authenticated/work-orders': typeof AuthenticatedWorkOrdersRoute
   '/_authenticated/equipment/$id': typeof AuthenticatedEquipmentIdRoute
   '/_authenticated/equipment/': typeof AuthenticatedEquipmentIndexRoute
 }
@@ -86,7 +159,15 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/breakdowns'
     | '/dashboard'
+    | '/inventory'
+    | '/predictive'
+    | '/preventive'
+    | '/profile'
+    | '/reliability'
+    | '/users'
+    | '/work-orders'
     | '/equipment/$id'
     | '/equipment/'
   fileRoutesByTo: FileRoutesByTo
@@ -94,7 +175,15 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/breakdowns'
     | '/dashboard'
+    | '/inventory'
+    | '/predictive'
+    | '/preventive'
+    | '/profile'
+    | '/reliability'
+    | '/users'
+    | '/work-orders'
     | '/equipment/$id'
     | '/equipment'
   id:
@@ -103,7 +192,15 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/breakdowns'
     | '/_authenticated/dashboard'
+    | '/_authenticated/inventory'
+    | '/_authenticated/predictive'
+    | '/_authenticated/preventive'
+    | '/_authenticated/profile'
+    | '/_authenticated/reliability'
+    | '/_authenticated/users'
+    | '/_authenticated/work-orders'
     | '/_authenticated/equipment/$id'
     | '/_authenticated/equipment/'
   fileRoutesById: FileRoutesById
@@ -145,11 +242,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/breakdowns': {
+      id: '/_authenticated/breakdowns'
+      path: '/breakdowns'
+      fullPath: '/breakdowns'
+      preLoaderRoute: typeof AuthenticatedBreakdownsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventory': {
+      id: '/_authenticated/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/predictive': {
+      id: '/_authenticated/predictive'
+      path: '/predictive'
+      fullPath: '/predictive'
+      preLoaderRoute: typeof AuthenticatedPredictiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/preventive': {
+      id: '/_authenticated/preventive'
+      path: '/preventive'
+      fullPath: '/preventive'
+      preLoaderRoute: typeof AuthenticatedPreventiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reliability': {
+      id: '/_authenticated/reliability'
+      path: '/reliability'
+      fullPath: '/reliability'
+      preLoaderRoute: typeof AuthenticatedReliabilityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/users': {
+      id: '/_authenticated/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthenticatedUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/work-orders': {
+      id: '/_authenticated/work-orders'
+      path: '/work-orders'
+      fullPath: '/work-orders'
+      preLoaderRoute: typeof AuthenticatedWorkOrdersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/equipment/': {
@@ -170,13 +323,29 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBreakdownsRoute: typeof AuthenticatedBreakdownsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
+  AuthenticatedPredictiveRoute: typeof AuthenticatedPredictiveRoute
+  AuthenticatedPreventiveRoute: typeof AuthenticatedPreventiveRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedReliabilityRoute: typeof AuthenticatedReliabilityRoute
+  AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
+  AuthenticatedWorkOrdersRoute: typeof AuthenticatedWorkOrdersRoute
   AuthenticatedEquipmentIdRoute: typeof AuthenticatedEquipmentIdRoute
   AuthenticatedEquipmentIndexRoute: typeof AuthenticatedEquipmentIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBreakdownsRoute: AuthenticatedBreakdownsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
+  AuthenticatedPredictiveRoute: AuthenticatedPredictiveRoute,
+  AuthenticatedPreventiveRoute: AuthenticatedPreventiveRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedReliabilityRoute: AuthenticatedReliabilityRoute,
+  AuthenticatedUsersRoute: AuthenticatedUsersRoute,
+  AuthenticatedWorkOrdersRoute: AuthenticatedWorkOrdersRoute,
   AuthenticatedEquipmentIdRoute: AuthenticatedEquipmentIdRoute,
   AuthenticatedEquipmentIndexRoute: AuthenticatedEquipmentIndexRoute,
 }
