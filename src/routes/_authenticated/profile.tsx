@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeader, Panel } from "@/components/common";
 import { ROLE_LABELS, useMe } from "@/lib/auth";
+import { useLang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({ meta: [{ title: "My profile — Maintenix" }, { name: "description", content: "Your Maintenix profile and roles." }, { property: "og:title", content: "My profile — Maintenix" }, { property: "og:description", content: "User profile." }] }),
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 function Profile() {
   const { data: me } = useMe();
   const qc = useQueryClient();
+  const { t } = useLang();
   if (!me) return null;
   return (
     <div className="max-w-xl">
@@ -28,11 +30,11 @@ function Profile() {
           if (error) return void toast.error(error.message);
           toast.success("Profile updated"); qc.invalidateQueries({ queryKey: ["me"] });
         }}>
-          <div><Label htmlFor="full_name">Full name</Label><Input id="full_name" name="full_name" defaultValue={me.profile?.full_name ?? ""} className="mt-1.5" /></div>
-          <div><Label htmlFor="department">Department</Label><Input id="department" name="department" defaultValue={me.profile?.department ?? ""} className="mt-1.5" /></div>
-          <div><Label htmlFor="specialty">Specialty</Label><Input id="specialty" name="specialty" defaultValue={me.profile?.specialty ?? ""} className="mt-1.5" /></div>
-          <div className="text-sm"><span className="text-muted-foreground">Roles: </span>{me.roles.map((r) => ROLE_LABELS[r]).join(", ")}</div>
-          <Button type="submit">Save</Button>
+          <div><Label htmlFor="full_name">{t("Full name")}</Label><Input id="full_name" name="full_name" defaultValue={me.profile?.full_name ?? ""} className="mt-1.5" /></div>
+          <div><Label htmlFor="department">{t("Department")}</Label><Input id="department" name="department" defaultValue={me.profile?.department ?? ""} className="mt-1.5" /></div>
+          <div><Label htmlFor="specialty">{t("Specialty")}</Label><Input id="specialty" name="specialty" defaultValue={me.profile?.specialty ?? ""} className="mt-1.5" /></div>
+          <div className="text-sm"><span className="text-muted-foreground">{t("Roles: ")}</span>{me.roles.map((r) => ROLE_LABELS[r]).join(", ")}</div>
+          <Button type="submit">{t("Save")}</Button>
         </form>
       </Panel>
     </div>
