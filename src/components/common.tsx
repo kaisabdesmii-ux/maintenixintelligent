@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLang } from "@/lib/i18n";
 
 const TONES: Record<string, string> = {
   operational: "bg-success/15 text-success",
@@ -30,19 +31,21 @@ const TONES: Record<string, string> = {
 
 export function StatusBadge({ value }: { value: string | null | undefined }) {
   const v = value ?? "—";
+  const { t } = useLang();
   return (
     <span className={cn("inline-flex items-center rounded px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide whitespace-nowrap", TONES[v] ?? "bg-muted text-muted-foreground")}>
-      {v.replace(/_/g, " ")}
+      {t(v.replace(/_/g, " "))}
     </span>
   );
 }
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string | undefined; actions?: ReactNode }) {
+  const { t } = useLang();
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold md:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+        <h1 className="text-2xl font-bold md:text-3xl">{t(title)}</h1>
+        {subtitle && <p className="mt-1 text-sm text-muted-foreground">{t(subtitle)}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -64,10 +67,11 @@ export function KpiCard({ label, value, icon: Icon, hint, tone = "primary" }: { 
 }
 
 export function Panel({ title, children, className, action }: { title: string; children: ReactNode; className?: string; action?: ReactNode }) {
+  const { t } = useLang();
   return (
     <section className={cn("rounded-lg border bg-card p-4", className)}>
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold">{title}</h3>
+        <h3 className="text-sm font-semibold">{t(title)}</h3>
         {action}
       </div>
       {children}

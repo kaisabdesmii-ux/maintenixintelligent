@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Wordmark } from "@/components/brand";
 import { ROLE_LABELS, useMe } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { useLang } from "@/lib/i18n";
+import { LangSwitch } from "@/components/lang-switch";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -30,6 +32,7 @@ function Shell() {
   const [open, setOpen] = useState(false);
   const { data: me } = useMe();
   const navigate = useNavigate();
+  const { t } = useLang();
   const isAdmin = me?.roles.includes("admin");
 
   const nav = (
@@ -38,12 +41,12 @@ function Shell() {
         <Link key={n.to} to={n.to} onClick={() => setOpen(false)}
           className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           activeProps={{ className: "bg-sidebar-accent !text-sidebar-primary font-medium" }}>
-          <n.icon className="h-4 w-4" />{n.label}
+          <n.icon className="h-4 w-4" />{t(n.label)}
         </Link>
       ))}
       {isAdmin && (
         <Link to="/users" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" activeProps={{ className: "bg-sidebar-accent !text-sidebar-primary font-medium" }}>
-          <ShieldCheck className="h-4 w-4" />Users & Roles
+          <ShieldCheck className="h-4 w-4" />{t("Users & Roles")}
         </Link>
       )}
     </nav>
@@ -62,24 +65,25 @@ function Shell() {
           </div>
         </Link>
         <button onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/auth" }); }} className="mt-1 flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent">
-          <LogOut className="h-4 w-4" />Sign out
+          <LogOut className="h-4 w-4" />{t("Sign out")}
         </button>
+        <LangSwitch className="mt-2 px-3 text-sidebar-foreground/80" />
       </div>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 lg:block">{sidebar}</aside>
+      <aside className="fixed inset-y-0 start-0 z-30 hidden w-64 lg:block">{sidebar}</aside>
       <div className={cn("fixed inset-0 z-40 lg:hidden", open ? "block" : "hidden")}>
         <div className="absolute inset-0 bg-foreground/40" onClick={() => setOpen(false)} />
-        <div className="absolute inset-y-0 left-0 w-64">{sidebar}</div>
+        <div className="absolute inset-y-0 start-0 w-64">{sidebar}</div>
       </div>
       <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-card/90 px-4 backdrop-blur lg:hidden">
         <button onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
         <span className="font-display font-bold">MAINTENIX</span>
       </header>
-      <main className="lg:pl-64">
+      <main className="lg:ps-64">
         <div className="mx-auto max-w-[1500px] p-4 md:p-8"><Outlet /></div>
       </main>
     </div>
