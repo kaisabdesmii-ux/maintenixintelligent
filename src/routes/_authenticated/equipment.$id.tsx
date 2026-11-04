@@ -9,7 +9,7 @@ import { useRows, useSave } from "@/lib/data";
 import { PERMS, useMe } from "@/lib/auth";
 import { availability, fmt, mtbf, mttr, riskScore } from "@/lib/kpi";
 import { Activity, Clock, DollarSign, Timer } from "lucide-react";
-import { EQ_FIELDS } from "./equipment.index";
+import { EQ_FIELDS } from "@/lib/fields";
 
 export const Route = createFileRoute("/_authenticated/equipment/$id")({
   head: () => ({ meta: [{ title: "Equipment record — Maintenix" }, { name: "description", content: "Machine technical record, history and reliability." }, { property: "og:title", content: "Equipment record — Maintenix" }, { property: "og:description", content: "Machine technical record." }] }),
