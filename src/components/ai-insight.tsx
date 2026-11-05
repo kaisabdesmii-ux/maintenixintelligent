@@ -10,7 +10,7 @@ export type InsightInput = {
   equipment: { id: string; code: string; name: string };
   score: number;
   level: "low" | "medium" | "high";
-  last?: { temperature?: number | null; vibration?: number | null; pressure?: number | null } | null;
+  last?: { temperature?: number | null; vibration?: number | null; pressure?: number | null } | null | undefined;
   technicians?: string[];
 };
 
