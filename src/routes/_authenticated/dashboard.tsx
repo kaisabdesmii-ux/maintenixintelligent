@@ -77,6 +77,32 @@ function Dashboard() {
 
   const depts = [...new Set((eq.data ?? []).flatMap((e) => [e.workshop]).filter(Boolean))];
   const cnt = (s: string) => d.equipment.filter((e) => e.status === s).length;
+  const { t } = useLang();
+
+  // Live IoT simulation: drifts around the latest stored readings (client-side only).
+  const baseReadings = useMemo<LiveReading[]>(() => d.equipment.map((e) => {
+    const r = d.latest.get(e.id);
+    return { equipment_id: e.id, temperature: Number(r?.temperature ?? 45), vibration: Number(r?.vibration ?? 1), pressure: Number(r?.pressure ?? 6), hours: Number(e.operating_hours ?? 0), at: new Date().toISOString() };
+  }), [d.equipment, d.latest]);
+  const live = useLiveTelemetry(baseReadings);
+
+  const topRisk = useMemo(() => [...d.risks].sort((a, b) => b.score - a.score), [d.risks]);
+  const focusId = topRisk[0]?.e.id;
+  const [series, setSeries] = useState<{ t: string; temperature: number; vibration: number }[]>([]);
+  useEffect(() => { setSeries([]); }, [focusId]);
+  useEffect(() => {
+    const r = live.find((l) => l.equipment_id === focusId);
+    if (!r) return;
+    setSeries((s) => [...s.slice(-29), { t: new Date().toLocaleTimeString(), temperature: r.temperature, vibration: r.vibration }]);
+  }, [live, focusId]);
+
+  const OEE = oee(d.avail);
+  const woOpen = d.orders.filter((w) => ["draft", "pending_approval", "scheduled"].includes(w.status)).length;
+  const woProg = d.orders.filter((w) => ["in_progress", "waiting_parts"].includes(w.status)).length;
+  const woDone = d.orders.filter((w) => ["completed", "validated"].includes(w.status)).length;
+  const technicians = [...new Set(d.orders.map((w) => w.assigned_technician).filter(Boolean) as string[])];
+  const focusEq = topRisk[0]?.e;
+  const focusLive = live.find((l) => l.equipment_id === focusId);
 
   return (
     <div>
