@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Pencil, Plus } from "lucide-react";
+import { FileDown, Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, StatusBadge } from "@/components/common";
 import { DataTable } from "@/components/data-table";
@@ -23,6 +23,7 @@ function WorkOrders() {
   const save = useSave("work_orders");
   const { data: me } = useMe();
   const [status, setStatus] = useState("");
+  const [priority, setPriority] = useState("");
   const fields: Field[] = [
     { name: "equipment_id", label: "Machine", type: "select", options: (eq.data ?? []).map((e) => ({ value: e.id, label: `${e.code} — ${e.name}` })), required: true, full: true },
     { name: "breakdown_id", label: "Related breakdown", type: "select", options: (bd.data ?? []).filter((b) => b.status !== "closed").map((b) => ({ value: b.id, label: `${b.reference} — ${b.description}` })), full: true },
@@ -45,15 +46,34 @@ function WorkOrders() {
     await save.mutateAsync({ id, values });
   };
   const counts = Object.fromEntries(WO_STATUS.map((s) => [s, (data ?? []).filter((w) => w.status === s).length]));
+  const filtered = (data ?? []).filter((w) => (!status || w.status === status) && (!priority || w.priority === priority));
+
+  function exportPdf() {
+    const rows = filtered.map((w) => `<tr><td>${w.number}</td><td>${w.equipment?.name ?? ""}</td><td>${w.description}</td><td>${w.priority}</td><td>${w.status.replace(/_/g, " ")}</td><td>${w.assigned_technician ?? "—"}</td><td>${w.planned_date ?? "—"}</td><td style="text-align:right">${fmt.money(Number(w.total_cost))}</td></tr>`).join("");
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.write(`<html><head><title>Work Orders Report</title><style>body{font-family:system-ui;padding:24px;color:#111}h1{font-size:20px}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:16px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f0f0f0}</style></head><body><h1>Maintenix — Work Orders Report</h1><p>${new Date().toLocaleString()} — ${filtered.length} work orders</p><table><thead><tr><th>No.</th><th>Machine</th><th>Work</th><th>Priority</th><th>Status</th><th>Technician</th><th>Planned</th><th>Total</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+    win.document.close();
+    win.print();
+  }
 
   return (
     <div>
       <PageHeader title="Work Orders" subtitle="Draft → approval → scheduled → in progress → completed → validated."
-        actions={canEdit && <FormDialog title="New work order" fields={fields} initial={{ type: "corrective", priority: "medium", status: "draft" }} onSubmit={onSave()} trigger={<Button><Plus className="h-4 w-4" />New work order</Button>} />} />
-      <DataTable rows={(data ?? []).filter((w) => !status || w.status === status)} loading={isLoading} searchKeys={["number", "description", "equipment.name", "assigned_technician"]}
-        toolbar={<div className="flex flex-wrap gap-1">{["", ...WO_STATUS].map((s) => (
-          <button key={s} onClick={() => setStatus(s)} className={cn("rounded-md px-2.5 py-1 text-xs capitalize", status === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent")}>{s ? `${s.replace(/_/g, " ")} (${counts[s]})` : "All"}</button>
-        ))}</div>}
+        actions={<>
+          <Button variant="outline" onClick={exportPdf}><FileDown className="h-4 w-4" />Export PDF</Button>
+          {canEdit && <FormDialog title="New work order" fields={fields} initial={{ type: "corrective", priority: "medium", status: "draft" }} onSubmit={onSave()} trigger={<Button><Plus className="h-4 w-4" />New work order</Button>} />}
+        </>} />
+      <DataTable rows={filtered} loading={isLoading} searchKeys={["number", "description", "equipment.name", "assigned_technician"]}
+        toolbar={<div className="flex flex-wrap items-center gap-1">
+          <div className="flex flex-wrap gap-1">{["", ...WO_STATUS].map((s) => (
+            <button key={s} onClick={() => setStatus(s)} className={cn("rounded-md px-2.5 py-1 text-xs capitalize", status === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent")}>{s ? `${s.replace(/_/g, " ")} (${counts[s]})` : "All"}</button>
+          ))}</div>
+          <span className="mx-1 h-4 w-px bg-border" />
+          <div className="flex flex-wrap gap-1">{["", ...LEVELS].map((p) => (
+            <button key={p} onClick={() => setPriority(p)} className={cn("rounded-md px-2.5 py-1 text-xs capitalize", priority === p ? "bg-warning text-warning-foreground" : "bg-muted text-muted-foreground hover:bg-accent")}>{p || "All urgencies"}</button>
+          ))}</div>
+        </div>}
         cols={[
           { key: "number", label: "No.", render: (r) => <span className="font-mono text-xs text-primary">{r.number}</span> },
           { key: "equipment", label: "Machine", render: (r) => r.equipment?.name },
