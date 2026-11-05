@@ -112,7 +112,103 @@ function Dashboard() {
           <select value={days} onChange={(e) => setDays(+e.target.value)} className="h-9 rounded-md border bg-card px-3 text-sm"><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option><option value={180}>Last 6 months</option><option value={365}>Last 12 months</option></select>
         </>} />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+      {/* Enterprise KPI row */}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="glass flex items-center gap-4 rounded-lg p-4">
+          <div className="relative h-24 w-24 shrink-0">
+            <svg viewBox="0 0 84 84" className="h-24 w-24 -rotate-90">
+              <circle cx="42" cy="42" r="34" fill="none" stroke="var(--muted)" strokeWidth="8" />
+              <circle cx="42" cy="42" r="34" fill="none" stroke="var(--primary)" strokeWidth="8" strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 34} strokeDashoffset={2 * Math.PI * 34 * (1 - OEE)}
+                style={{ filter: "drop-shadow(0 0 6px var(--primary))", transition: "stroke-dashoffset 0.6s" }} />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center font-display text-lg font-bold tabular-nums">{fmt.pct(OEE)}</span>
+          </div>
+          <div>
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Overall Equipment Effectiveness")}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{t("Availability × performance × quality")}</div>
+          </div>
+        </div>
+        <div className="glass rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Active Work Orders")}</span>
+            <ClipboardList className="h-4 w-4 text-info" />
+          </div>
+          <div className="mt-2 font-display text-2xl font-bold tabular-nums">{woOpen + woProg}</div>
+          <div className="mt-2 flex gap-3 font-mono text-[11px]">
+            <span className="text-warning">{t("Pending")}: {woOpen}</span>
+            <span className="text-info">{t("In progress")}: {woProg}</span>
+            <span className="text-success">{t("Completed")}: {woDone}</span>
+          </div>
+        </div>
+        <div className="glass rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t("Predictive Risk Level")}</span>
+            <ShieldAlert className="h-4 w-4 text-destructive" />
+          </div>
+          <div className="mt-2 font-display text-2xl font-bold tabular-nums">{d.highRisk.length}</div>
+          <div className="mt-2 text-xs text-muted-foreground">{t("high-risk machines predicted to fail within 72 h")}</div>
+        </div>
+        <div className="glass rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">MTTR / MTBF</span>
+            <Timer className="h-4 w-4 text-primary" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-4">
+            <span className="font-display text-2xl font-bold tabular-nums">{fmt.num(d.MTTR, 1)}<span className="text-sm font-normal text-muted-foreground"> h</span></span>
+            <span className="font-display text-2xl font-bold tabular-nums text-primary">{fmt.num(d.MTBF)}<span className="text-sm font-normal text-muted-foreground"> h</span></span>
+          </div>
+          <div className="mt-2 text-xs text-muted-foreground">{t("Mean time to repair / between failures")}</div>
+        </div>
+      </div>
+
+      {/* Live IoT telemetry */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <Panel title={t("Live IoT Telemetry")} className="lg:col-span-1" action={<span className="flex items-center gap-1.5 font-mono text-[10px] uppercase text-success"><span className="h-1.5 w-1.5 rounded-full bg-success pulse-dot" />LIVE</span>}>
+          <div className="space-y-3">
+            {topRisk.slice(0, 4).map(({ e }) => {
+              const r = live.find((l) => l.equipment_id === e.id);
+              if (!r) return null;
+              const lvl = (k: "temperature" | "vibration" | "pressure", v: number) => telemetryLevel(k, v);
+              const cls = { normal: "text-success", warning: "text-warning", critical: "text-destructive" };
+              return (
+                <div key={e.id} className="rounded-md border bg-background/40 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-medium">{e.name}</span>
+                    <span className="font-mono text-[10px] text-muted-foreground">{fmt.num(r.hours)} h</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div><Thermometer className={cn("mx-auto h-3.5 w-3.5", cls[lvl("temperature", r.temperature)])} /><div className={cn("font-mono text-sm tabular-nums", cls[lvl("temperature", r.temperature)])}>{r.temperature.toFixed(1)}°</div></div>
+                    <div><Vibrate className={cn("mx-auto h-3.5 w-3.5", cls[lvl("vibration", r.vibration)])} /><div className={cn("font-mono text-sm tabular-nums", cls[lvl("vibration", r.vibration)])}>{r.vibration.toFixed(2)}</div></div>
+                    <div><Radio className={cn("mx-auto h-3.5 w-3.5", cls[lvl("pressure", r.pressure)])} /><div className={cn("font-mono text-sm tabular-nums", cls[lvl("pressure", r.pressure)])}>{Number(r.pressure).toFixed(1)}</div></div>
+                  </div>
+                </div>
+              );
+            })}
+            {topRisk.length === 0 && <Empty text={t("No machines in the selected scope.")} />}
+          </div>
+        </Panel>
+        <Panel title={`${t("Live Vibration vs Temperature")}${focusEq ? ` — ${focusEq.name}` : ""}`} className="lg:col-span-2">
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={series}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="t" fontSize={10} tickMargin={6} />
+              <YAxis yAxisId="t" fontSize={11} domain={[0, 100]} />
+              <YAxis yAxisId="v" orientation="right" fontSize={11} domain={[0, 6]} />
+              <Tooltip {...tip} /><Legend />
+              <ReferenceLine yAxisId="t" y={THRESHOLDS.temperature} stroke="var(--destructive)" strokeDasharray="4 4" label={{ value: `${THRESHOLDS.temperature}°C`, fill: "var(--destructive)", fontSize: 10 }} />
+              <ReferenceLine yAxisId="v" y={THRESHOLDS.vibration} stroke="var(--warning)" strokeDasharray="4 4" />
+              <Line yAxisId="t" dataKey="temperature" stroke={C[4]} dot={false} strokeWidth={2} name={t("Temperature (°C)")} isAnimationActive={false} />
+              <Line yAxisId="v" dataKey="vibration" stroke={C[0]} dot={false} strokeWidth={2} name={t("Vibration (mm/s)")} isAnimationActive={false} />
+            </LineChart>
+          </ResponsiveContainer>
+          {focusEq && topRisk[0] && riskLevel(topRisk[0].score) !== "low" && (
+            <AiInsightBox className="mt-3" input={{ equipment: focusEq, score: topRisk[0].score, level: riskLevel(topRisk[0].score), last: focusLive, technicians }} />
+          )}
+        </Panel>
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
         <KpiCard label="Total machines" value={d.equipment.length} icon={Cog} />
         <KpiCard label="Operational" value={cnt("operational")} icon={CheckCircle2} tone="success" />
         <KpiCard label="Under maintenance" value={cnt("under_maintenance")} icon={Wrench} tone="info" />
