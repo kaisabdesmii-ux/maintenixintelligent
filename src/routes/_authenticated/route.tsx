@@ -7,6 +7,7 @@ import { ROLE_LABELS, useMe } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/lib/i18n";
 import { LangSwitch } from "@/components/lang-switch";
+import { Topbar } from "@/components/topbar";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -84,6 +85,7 @@ function Shell() {
         <span className="font-display font-bold">MAINTENIX</span>
       </header>
       <main className="lg:ps-64">
+        <Topbar />
         <div className="mx-auto max-w-[1500px] p-4 md:p-8"><Outlet /></div>
       </main>
     </div>
