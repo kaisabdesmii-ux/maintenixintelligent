@@ -9,7 +9,8 @@ import { PageHeader, Panel, StatusBadge } from "@/components/common";
 import { FormDialog, type Field } from "@/components/form-dialog";
 import { useRows, useSave } from "@/lib/data";
 import { PERMS, useMe } from "@/lib/auth";
-import { riskLevel, riskScore, THRESHOLDS } from "@/lib/kpi";
+import { healthScore, riskLevel, riskScore, THRESHOLDS } from "@/lib/kpi";
+import { AiInsightBox } from "@/components/ai-insight";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,8 @@ const ACTIONS: Record<string, string> = {
 function Predictive() {
   const eq = useRows("equipment", { order: "code", asc: true });
   const sr = useRows("sensor_readings", { order: "recorded_at", asc: true });
+  const wo = useRows("work_orders");
+  const technicians = [...new Set((wo.data ?? []).map((w) => w.assigned_technician).filter(Boolean) as string[])];
   const save = useSave("sensor_readings");
   const qc = useQueryClient();
   const { data: me } = useMe();
@@ -75,7 +78,7 @@ function Predictive() {
         <div className="space-y-2">
           {cards.map((c) => (
             <button key={c.e.id} onClick={() => setSel(c.e.id)} className={cn("w-full rounded-lg border bg-card p-3 text-left transition-colors hover:border-primary", active?.e.id === c.e.id && "border-primary ring-1 ring-primary")}>
-              <div className="flex items-center justify-between"><span className="text-sm font-medium">{c.e.name}</span><StatusBadge value={c.level} /></div>
+              <div className="flex items-center justify-between"><span className="text-sm font-medium">{c.e.name}</span><span className="flex items-center gap-2"><span className={cn("rounded px-1.5 py-0.5 font-mono text-[10px] font-bold", c.level === "high" ? "bg-destructive/15 text-destructive" : c.level === "medium" ? "bg-warning/20 text-warning" : "bg-success/15 text-success")}>{healthScore(c.score)}% HP</span><StatusBadge value={c.level} /></span></div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted"><div className={cn("h-full", c.level === "high" ? "bg-destructive" : c.level === "medium" ? "bg-warning" : "bg-success")} style={{ width: `${c.score}%` }} /></div>
               <div className="mt-1 flex justify-between font-mono text-[11px] text-muted-foreground"><span>risk {c.score}/100</span><span>{c.anomalies} anomalies</span></div>
             </button>
@@ -89,7 +92,11 @@ function Predictive() {
                   <div key={l as string} className="rounded-md bg-muted p-3"><div className="text-xs text-muted-foreground">{l}</div><div className="font-display text-xl font-bold tabular-nums">{v != null ? Number(v).toFixed(1) : "—"} <span className="text-xs font-normal">{u}</span></div></div>
                 ))}
               </div>
-              <p className="mt-3 rounded-md border-l-4 border-primary bg-accent/50 p-3 text-sm"><b>Suggested action:</b> {ACTIONS[active.level]}</p>
+              {active.level === "low" ? (
+                <p className="mt-3 rounded-md border-l-4 border-primary bg-accent/50 p-3 text-sm"><b>Suggested action:</b> {ACTIONS[active.level]}</p>
+              ) : (
+                <AiInsightBox className="mt-3" input={{ equipment: active.e, score: active.score, level: active.level, last: active.last, technicians }} />
+              )}
             </Panel>
             <Panel title="Temperature trend">
               <ResponsiveContainer width="100%" height={200}><LineChart data={active.rs.map((r) => ({ ...r, t: new Date(r.recorded_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }) }))}><CartesianGrid strokeDasharray="3 3" stroke="var(--border)" /><XAxis dataKey="t" fontSize={11} /><YAxis fontSize={11} /><Tooltip /><ReferenceLine y={THRESHOLDS.temperature} stroke="var(--destructive)" strokeDasharray="4 4" /><Line dataKey="temperature" stroke="var(--chart-5)" dot={false} /></LineChart></ResponsiveContainer>
