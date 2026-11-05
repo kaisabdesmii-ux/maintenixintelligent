@@ -1,10 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Activity, AlertTriangle, Boxes, CheckCircle2, ClipboardList, Clock, Cog, DollarSign, Gauge, PackageX, ShieldAlert, Timer, Wrench, Zap } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Activity, AlertTriangle, Boxes, CheckCircle2, ClipboardList, Clock, Cog, DollarSign, Gauge, PackageX, Radio, ShieldAlert, Thermometer, Timer, Vibrate, Wrench, Zap } from "lucide-react";
 import { useRows } from "@/lib/data";
-import { availability, fmt, mtbf, mttr, riskLevel, riskScore, stockState } from "@/lib/kpi";
+import { availability, fmt, mtbf, mttr, oee, riskLevel, riskScore, stockState, THRESHOLDS } from "@/lib/kpi";
+import { telemetryLevel, useLiveTelemetry, type LiveReading } from "@/lib/telemetry";
+import { AiInsightBox } from "@/components/ai-insight";
 import { Empty, KpiCard, PageHeader, Panel, StatusBadge } from "@/components/common";
+import { useLang } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Smart Maintenance Overview — Maintenix" }, { name: "description", content: "Live maintenance KPIs, reliability and alerts." }, { property: "og:title", content: "Smart Maintenance Overview — Maintenix" }, { property: "og:description", content: "Live maintenance KPIs." }] }),
@@ -63,8 +67,9 @@ function Dashboard() {
       ...parts.filter((p) => stockState(p) !== "ok").map((p) => ({ tone: stockState(p), text: `${stockState(p) === "out" ? "Out of stock" : "Low stock"}: ${p.designation} (${p.quantity})`, to: "/inventory" })),
     ];
     return {
-      equipment, breakdowns, orders, MTBF, MTTR, avail: availability(MTBF, MTTR), prevRate, cost, trend, statusDist, tech: Object.values(techMap), riskDist, alerts,
+      equipment, breakdowns, orders, MTBF, MTTR, avail: availability(MTBF, MTTR), prevRate, cost, trend, statusDist, tech: Object.values(techMap), riskDist, alerts, latest, risks,
       atRisk: risks.filter((r) => riskLevel(r.score) !== "low").length,
+      highRisk: risks.filter((r) => riskLevel(r.score) === "high"),
       parts, low: parts.filter((p) => stockState(p) !== "ok").length,
       recent: [...breakdowns.slice(0, 4).map((b) => ({ t: b.occurred_at, ref: b.reference, txt: b.description, s: b.status })), ...orders.slice(0, 4).map((w) => ({ t: w.created_at, ref: w.number, txt: w.description, s: w.status }))].sort((a, b) => b.t.localeCompare(a.t)).slice(0, 7),
     };
