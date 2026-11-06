@@ -135,10 +135,10 @@ function Dashboard() {
             <ClipboardList className="h-4 w-4 text-info" />
           </div>
           <div className="mt-2 font-display text-2xl font-bold tabular-nums">{woOpen + woProg}</div>
-          <div className="mt-2 flex gap-3 font-mono text-[11px]">
-            <span className="text-warning">{t("Pending")}: {woOpen}</span>
-            <span className="text-info">{t("In progress")}: {woProg}</span>
-            <span className="text-success">{t("Completed")}: {woDone}</span>
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px]">
+            <span className="whitespace-nowrap text-warning">{t("Pending")}: {woOpen}</span>
+            <span className="whitespace-nowrap text-info">{t("In progress")}: {woProg}</span>
+            <span className="whitespace-nowrap text-success">{t("Completed")}: {woDone}</span>
           </div>
         </div>
         <div className="glass rounded-lg p-4">
