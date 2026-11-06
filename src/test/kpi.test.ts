@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { mttr, mtbf, availability, rpn, rpnLevel, stockState, riskScore, oee, healthScore, OEE_ASSUMPTIONS } from "@/lib/kpi";
+import { weibullFit, weibullR, weibullF, weibullMedianTbf, pareto, timesBetweenFailures } from "@/lib/weibull";
 
 describe("kpi", () => {
   const b = [{ downtime_hours: 4 }, { downtime_hours: 6 }];

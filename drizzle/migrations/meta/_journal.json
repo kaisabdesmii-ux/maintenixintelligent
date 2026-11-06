@@ -15,6 +15,13 @@
       "when": 1793826831696,
       "tag": "0001_restrict_read_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793947445984,
+      "tag": "0002_work_order_validation_and_fmea_action_status",
+      "breakpoints": true
     }
   ]
 }
