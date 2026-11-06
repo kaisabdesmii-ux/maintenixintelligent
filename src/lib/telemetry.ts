@@ -16,11 +16,11 @@ export type LiveReading = {
  */
 export function useLiveTelemetry(base: LiveReading[], intervalMs = 3000): LiveReading[] {
   const [live, setLive] = useState<LiveReading[]>(base);
-  const key = base.map((b) => b.equipment_id).join(",");
   const baseRef = useRef(base);
   baseRef.current = base;
 
-  useEffect(() => { setLive(baseRef.current); }, [key]);
+  // Re-sync whenever the base readings recompute (e.g. sensor data arrives after equipment).
+  useEffect(() => { setLive(baseRef.current); }, [base]);
 
   useEffect(() => {
     if (!base.length) return;
@@ -30,14 +30,14 @@ export function useLiveTelemetry(base: LiveReading[], intervalMs = 3000): LiveRe
           ...r,
           temperature: +(r.temperature + (Math.random() - 0.5) * 0.8).toFixed(1),
           vibration: Math.max(0, +(r.vibration + (Math.random() - 0.5) * 0.15).toFixed(2)),
-          pressure: Math.max(0, +(r.pressure + (Math.random() - 0.5) * 0.1)).toFixed(2) as unknown as number,
+          pressure: +Math.max(0, Number(r.pressure) + (Math.random() - 0.5) * 0.1).toFixed(2),
           hours: +(r.hours + intervalMs / 3.6e6).toFixed(2),
           at: new Date().toISOString(),
         }))
       );
     }, intervalMs);
     return () => clearInterval(id);
-  }, [key, intervalMs, base.length]);
+  }, [base, intervalMs]);
 
   return live;
 }
