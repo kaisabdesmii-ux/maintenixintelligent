@@ -30,7 +30,7 @@ export function useLiveTelemetry(base: LiveReading[], intervalMs = 3000): LiveRe
           ...r,
           temperature: +(r.temperature + (Math.random() - 0.5) * 0.8).toFixed(1),
           vibration: Math.max(0, +(r.vibration + (Math.random() - 0.5) * 0.15).toFixed(2)),
-          pressure: Math.max(0, +(r.pressure + (Math.random() - 0.5) * 0.1)).toFixed(2) as unknown as number,
+          pressure: +Math.max(0, Number(r.pressure) + (Math.random() - 0.5) * 0.1).toFixed(2),
           hours: +(r.hours + intervalMs / 3.6e6).toFixed(2),
           at: new Date().toISOString(),
         }))
