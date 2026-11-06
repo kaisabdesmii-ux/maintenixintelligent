@@ -160,6 +160,7 @@ export type Database = {
       fmea_items: {
         Row: {
           action: string | null
+          action_status: string
           causes: string | null
           created_at: string
           deadline: string | null
@@ -176,6 +177,7 @@ export type Database = {
         }
         Insert: {
           action?: string | null
+          action_status?: string
           causes?: string | null
           created_at?: string
           deadline?: string | null
@@ -192,6 +194,7 @@ export type Database = {
         }
         Update: {
           action?: string | null
+          action_status?: string
           causes?: string | null
           created_at?: string
           deadline?: string | null
@@ -474,8 +477,12 @@ export type Database = {
           priority: string
           start_date: string | null
           status: string
+          submitted_at: string | null
           total_cost: number | null
           type: string
+          validated_at: string | null
+          validated_by: string | null
+          validation_comment: string | null
           work_performed: string | null
         }
         Insert: {
@@ -497,8 +504,12 @@ export type Database = {
           priority?: string
           start_date?: string | null
           status?: string
+          submitted_at?: string | null
           total_cost?: number | null
           type?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_comment?: string | null
           work_performed?: string | null
         }
         Update: {
@@ -520,8 +531,12 @@ export type Database = {
           priority?: string
           start_date?: string | null
           status?: string
+          submitted_at?: string | null
           total_cost?: number | null
           type?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_comment?: string | null
           work_performed?: string | null
         }
         Relationships: [
