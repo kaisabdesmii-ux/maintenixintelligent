@@ -16,11 +16,11 @@ export type LiveReading = {
  */
 export function useLiveTelemetry(base: LiveReading[], intervalMs = 3000): LiveReading[] {
   const [live, setLive] = useState<LiveReading[]>(base);
-  const key = base.map((b) => b.equipment_id).join(",");
   const baseRef = useRef(base);
   baseRef.current = base;
 
-  useEffect(() => { setLive(baseRef.current); }, [key]);
+  // Re-sync whenever the base readings recompute (e.g. sensor data arrives after equipment).
+  useEffect(() => { setLive(baseRef.current); }, [base]);
 
   useEffect(() => {
     if (!base.length) return;
@@ -37,7 +37,7 @@ export function useLiveTelemetry(base: LiveReading[], intervalMs = 3000): LiveRe
       );
     }, intervalMs);
     return () => clearInterval(id);
-  }, [key, intervalMs, base.length]);
+  }, [base, intervalMs]);
 
   return live;
 }
