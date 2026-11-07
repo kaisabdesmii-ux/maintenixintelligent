@@ -113,6 +113,37 @@ function Detail() {
             ) : <Empty text="No readings." />}
           </Panel>
         </TabsContent>
+        <TabsContent value="reliability">
+          <Panel title="Failure curves — real history vs Weibull model">
+            {!wb ? (
+              <div className="py-6 text-center">
+                <p className="text-sm text-muted-foreground">{b.length < 4 ? "Insufficient data: a Weibull estimate needs at least 4 recorded breakdowns (3 intervals)." : "Weibull estimation not possible on these intervals."}</p>
+                <p className="mt-2 text-xs text-muted-foreground">Options: record more breakdowns, enter historical data manually, or use the industrial reference catalog (estimates are always labeled as such).</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+                  <KpiCard label="β (shape)" value={wb.beta} icon={Activity} hint={wb.beta < 1 ? "Infant mortality" : wb.beta > 1 ? "Wear-out failures" : "Random failures"} />
+                  <KpiCard label="η (scale)" value={fmt.num(wb.eta) + " h"} icon={Timer} />
+                  <KpiCard label="Median TBF" value={fmt.num(weibullMedianTbf(wb)) + " h"} icon={Clock} />
+                  <KpiCard label="Next failure est." value={b.length ? new Date(new Date(b[b.length - 1].occurred_at).getTime() + weibullMedianTbf(wb) * 36e5).toLocaleDateString() : "—"} icon={Activity} tone="warning" hint="Statistical estimate, not a certainty" />
+                </div>
+                <ResponsiveContainer width="100%" height={280}>
+                  <LineChart data={curve}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="t" fontSize={11} label={{ value: "Operating hours since last failure", position: "insideBottom", offset: -2, fontSize: 11 }} />
+                    <YAxis domain={[0, 1]} fontSize={11} />
+                    <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} formatter={(v: any) => (typeof v === "number" ? (v * 100).toFixed(0) + "%" : v)} />
+                    <Legend />
+                    <Line dataKey="real" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} connectNulls name="Real history (measured)" />
+                    <Line dataKey="weibull" stroke="var(--chart-5)" strokeWidth={2} strokeDasharray="6 4" dot={false} name="Weibull R(t) — statistical model" />
+                  </LineChart>
+                </ResponsiveContainer>
+                <p className="mt-2 text-xs text-muted-foreground">Solid line: real measured reliability from recorded breakdowns. Dashed line: Weibull statistical model fitted on {wb.n} intervals — an estimate, never a measured fact.</p>
+              </>
+            )}
+          </Panel>
+        </TabsContent>
         <TabsContent value="fmea"><SimpleList rows={fm.data ?? []} cols={["function_name", "failure_mode", "severity", "occurrence", "detection", "rpn", "action"]} /></TabsContent>
       </Tabs>
     </div>
