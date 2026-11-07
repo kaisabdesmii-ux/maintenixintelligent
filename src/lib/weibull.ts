@@ -56,7 +56,7 @@ export function empiricalReliability(tbf: number[]): { t: number; r: number }[] 
 export function timesBetweenFailures(occurredAts: string[]): number[] {
   const ts = occurredAts.map((s) => new Date(s).getTime()).sort((a, b) => a - b);
   const out: number[] = [];
-  for (let i = 1; i < ts.length; i++) out.push((ts[i] - ts[i - 1]) / 36e5);
+  for (let i = 1; i < ts.length; i++) out.push((ts[i]! - ts[i - 1]!) / 36e5);
   return out;
 }
 

@@ -157,7 +157,6 @@ const DICT: Record<string, { fr: string; ar: string }> = {
   "Pareto — number of breakdowns": { fr: "Pareto — nombre de pannes", ar: "باريتو — عدد الأعطال" },
   "Pareto — downtime hours": { fr: "Pareto — heures d'arrêt", ar: "باريتو — ساعات التوقف" },
   "breakdowns": { fr: "pannes", ar: "أعطال" },
-  "Breakdowns": { fr: "Pannes", ar: "الأعطال" },
   "Hours": { fr: "Heures", ar: "ساعات" },
   "Downtime (h)": { fr: "Arrêt (h)", ar: "التوقف (س)" },
   "Cumulative %": { fr: "% cumulé", ar: "٪ تراكمي" },
