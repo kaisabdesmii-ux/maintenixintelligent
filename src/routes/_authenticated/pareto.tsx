@@ -84,7 +84,9 @@ function ParetoPage() {
         </select>
       </div>
 
-      {d.rowsP.length === 0 ? (
+      {bd.isLoading ? (
+        <Panel title="Pareto"><Empty text="Loading…" /></Panel>
+      ) : d.rowsP.length === 0 ? (
         <Panel title="Pareto"><Empty text="No breakdown data for this selection. Pareto requires real recorded events." /></Panel>
       ) : (
         <>
