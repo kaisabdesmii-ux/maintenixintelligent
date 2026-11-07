@@ -8,6 +8,8 @@ import { FormDialog } from "@/components/form-dialog";
 import { useRows, useSave } from "@/lib/data";
 import { PERMS, useMe } from "@/lib/auth";
 import { availability, fmt, mtbf, mttr, riskScore } from "@/lib/kpi";
+import { empiricalReliability, timesBetweenFailures, weibullFit, weibullMedianTbf, weibullR } from "@/lib/weibull";
+import { useLang } from "@/lib/i18n";
 import { Activity, Clock, DollarSign, Timer } from "lucide-react";
 import { EQ_FIELDS } from "@/lib/fields";
 
@@ -36,6 +38,17 @@ function Detail() {
   const cost = b.reduce((s, x) => s + Number(x.repair_cost), 0) + (wo.data ?? []).reduce((s, x) => s + Number(x.total_cost ?? 0), 0);
   const readings = (sr.data ?? []).map((r) => ({ ...r, t: new Date(r.recorded_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }) }));
   const risk = readings.length ? riskScore(readings[readings.length - 1]) : 0;
+  const tbf = timesBetweenFailures(b.map((x) => x.occurred_at));
+  const wb = weibullFit(tbf);
+  const empirical = empiricalReliability(tbf);
+  const tMax = wb ? Math.max(wb.eta * 1.5, ...tbf) : 0;
+  const curve = wb
+    ? Array.from({ length: 41 }, (_, i) => {
+        const t = (tMax / 40) * i;
+        const emp = empirical.filter((p) => p.t <= t).pop();
+        return { t: Math.round(t), weibull: +weibullR(t, wb).toFixed(3), real: emp ? emp.r : i === 0 ? 1 : undefined };
+      })
+    : [];
   const history = [...b.map((x) => ({ t: x.occurred_at, k: "Breakdown", ref: x.reference, txt: x.description, s: x.status })), ...(wo.data ?? []).map((x) => ({ t: x.end_date ?? x.created_at, k: "Work order", ref: x.number, txt: x.description, s: x.status }))].sort((a, c) => c.t.localeCompare(a.t));
 
   const info: [string, any][] = [["Manufacturer", e.manufacturer], ["Brand", e.brand], ["Model", e.model], ["Serial number", e.serial_number], ["Year", e.year_manufactured], ["Commissioned", e.commissioning_date], ["Location", e.location], ["Workshop", e.workshop], ["Department", e.department], ["Category", e.category], ["Responsible operator", e.responsible_operator], ["Operating hours", Number(e.operating_hours).toLocaleString()]];
@@ -65,7 +78,7 @@ function Detail() {
         <TabsList className="flex-wrap">
           <TabsTrigger value="info">Technical</TabsTrigger><TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="bd">Breakdowns ({b.length})</TabsTrigger><TabsTrigger value="wo">Work orders ({wo.data?.length ?? 0})</TabsTrigger>
-          <TabsTrigger value="sensors">Sensors</TabsTrigger><TabsTrigger value="fmea">AMDEC</TabsTrigger>
+          <TabsTrigger value="sensors">Sensors</TabsTrigger><TabsTrigger value="reliability">Reliability</TabsTrigger><TabsTrigger value="fmea">AMDEC</TabsTrigger>
         </TabsList>
         <TabsContent value="info">
           <Panel title="Technical information">
