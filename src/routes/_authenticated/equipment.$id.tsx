@@ -8,6 +8,7 @@ import { FormDialog } from "@/components/form-dialog";
 import { useRows, useSave } from "@/lib/data";
 import { PERMS, useMe } from "@/lib/auth";
 import { availability, fmt, mtbf, mttr, riskScore } from "@/lib/kpi";
+import { empiricalReliability, timesBetweenFailures, weibullFit, weibullMedianTbf, weibullR } from "@/lib/weibull";
 import { Activity, Clock, DollarSign, Timer } from "lucide-react";
 import { EQ_FIELDS } from "@/lib/fields";
 
@@ -36,6 +37,17 @@ function Detail() {
   const cost = b.reduce((s, x) => s + Number(x.repair_cost), 0) + (wo.data ?? []).reduce((s, x) => s + Number(x.total_cost ?? 0), 0);
   const readings = (sr.data ?? []).map((r) => ({ ...r, t: new Date(r.recorded_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }) }));
   const risk = readings.length ? riskScore(readings[readings.length - 1]) : 0;
+  const tbf = timesBetweenFailures(b.map((x) => x.occurred_at));
+  const wb = weibullFit(tbf);
+  const empirical = empiricalReliability(tbf);
+  const tMax = wb ? Math.max(wb.eta * 1.5, ...tbf) : 0;
+  const curve = wb
+    ? Array.from({ length: 41 }, (_, i) => {
+        const t = (tMax / 40) * i;
+        const emp = empirical.filter((p) => p.t <= t).pop();
+        return { t: Math.round(t), weibull: +weibullR(t, wb).toFixed(3), real: emp ? emp.r : i === 0 ? 1 : undefined };
+      })
+    : [];
   const history = [...b.map((x) => ({ t: x.occurred_at, k: "Breakdown", ref: x.reference, txt: x.description, s: x.status })), ...(wo.data ?? []).map((x) => ({ t: x.end_date ?? x.created_at, k: "Work order", ref: x.number, txt: x.description, s: x.status }))].sort((a, c) => c.t.localeCompare(a.t));
 
   const info: [string, any][] = [["Manufacturer", e.manufacturer], ["Brand", e.brand], ["Model", e.model], ["Serial number", e.serial_number], ["Year", e.year_manufactured], ["Commissioned", e.commissioning_date], ["Location", e.location], ["Workshop", e.workshop], ["Department", e.department], ["Category", e.category], ["Responsible operator", e.responsible_operator], ["Operating hours", Number(e.operating_hours).toLocaleString()]];
@@ -65,7 +77,7 @@ function Detail() {
         <TabsList className="flex-wrap">
           <TabsTrigger value="info">Technical</TabsTrigger><TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="bd">Breakdowns ({b.length})</TabsTrigger><TabsTrigger value="wo">Work orders ({wo.data?.length ?? 0})</TabsTrigger>
-          <TabsTrigger value="sensors">Sensors</TabsTrigger><TabsTrigger value="fmea">AMDEC</TabsTrigger>
+          <TabsTrigger value="sensors">Sensors</TabsTrigger><TabsTrigger value="reliability">Reliability</TabsTrigger><TabsTrigger value="fmea">AMDEC</TabsTrigger>
         </TabsList>
         <TabsContent value="info">
           <Panel title="Technical information">
@@ -98,6 +110,37 @@ function Detail() {
                 </LineChart>
               </ResponsiveContainer>
             ) : <Empty text="No readings." />}
+          </Panel>
+        </TabsContent>
+        <TabsContent value="reliability">
+          <Panel title="Failure curves — real history vs Weibull model">
+            {!wb ? (
+              <div className="py-6 text-center">
+                <p className="text-sm text-muted-foreground">{b.length < 4 ? "Insufficient data: a Weibull estimate needs at least 4 recorded breakdowns (3 intervals)." : "Weibull estimation not possible on these intervals."}</p>
+                <p className="mt-2 text-xs text-muted-foreground">Options: record more breakdowns, enter historical data manually, or use the industrial reference catalog (estimates are always labeled as such).</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+                  <KpiCard label="β (shape)" value={wb.beta} icon={Activity} hint={wb.beta < 1 ? "Infant mortality" : wb.beta > 1 ? "Wear-out failures" : "Random failures"} />
+                  <KpiCard label="η (scale)" value={fmt.num(wb.eta) + " h"} icon={Timer} />
+                  <KpiCard label="Median TBF" value={fmt.num(weibullMedianTbf(wb)) + " h"} icon={Clock} />
+                  <KpiCard label="Next failure est." value={b.length ? new Date(new Date(b[b.length - 1].occurred_at).getTime() + weibullMedianTbf(wb) * 36e5).toLocaleDateString() : "—"} icon={Activity} tone="warning" hint="Statistical estimate, not a certainty" />
+                </div>
+                <ResponsiveContainer width="100%" height={280}>
+                  <LineChart data={curve}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="t" fontSize={11} label={{ value: "Operating hours since last failure", position: "insideBottom", offset: -2, fontSize: 11 }} />
+                    <YAxis domain={[0, 1]} fontSize={11} />
+                    <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} formatter={(v: any) => (typeof v === "number" ? (v * 100).toFixed(0) + "%" : v)} />
+                    <Legend />
+                    <Line dataKey="real" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} connectNulls name="Real history (measured)" />
+                    <Line dataKey="weibull" stroke="var(--chart-5)" strokeWidth={2} strokeDasharray="6 4" dot={false} name="Weibull R(t) — statistical model" />
+                  </LineChart>
+                </ResponsiveContainer>
+                <p className="mt-2 text-xs text-muted-foreground">Solid line: real measured reliability from recorded breakdowns. Dashed line: Weibull statistical model fitted on {wb.n} intervals — an estimate, never a measured fact.</p>
+              </>
+            )}
           </Panel>
         </TabsContent>
         <TabsContent value="fmea"><SimpleList rows={fm.data ?? []} cols={["function_name", "failure_mode", "severity", "occurrence", "detection", "rpn", "action"]} /></TabsContent>
