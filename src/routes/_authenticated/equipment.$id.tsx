@@ -9,7 +9,6 @@ import { useRows, useSave } from "@/lib/data";
 import { PERMS, useMe } from "@/lib/auth";
 import { availability, fmt, mtbf, mttr, riskScore } from "@/lib/kpi";
 import { empiricalReliability, timesBetweenFailures, weibullFit, weibullMedianTbf, weibullR } from "@/lib/weibull";
-import { useLang } from "@/lib/i18n";
 import { Activity, Clock, DollarSign, Timer } from "lucide-react";
 import { EQ_FIELDS } from "@/lib/fields";
 
