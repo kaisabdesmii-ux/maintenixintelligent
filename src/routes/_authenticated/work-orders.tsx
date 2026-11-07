@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { FileDown, Pencil, Plus } from "lucide-react";
+import { CheckCircle2, FileDown, Pencil, Plus, Send, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, StatusBadge } from "@/components/common";
 import { DataTable } from "@/components/data-table";
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/work-orders")({
 });
 
 function WorkOrders() {
-  const { data, isLoading } = useRows("work_orders", { select: "*, equipment(code,name)", order: "created_at" });
+  const { data, isLoading } = useRows("work_orders", { select: "*, equipment(code,name,criticality)", order: "created_at" });
   const eq = useRows("equipment", { order: "code", asc: true });
   const bd = useRows("breakdowns", { order: "occurred_at" });
   const save = useSave("work_orders");
@@ -39,12 +39,39 @@ function WorkOrders() {
     { name: "work_performed", label: "Work performed", type: "textarea" }, { name: "comments", label: "Technician comments", type: "textarea" },
   ];
   const canEdit = me?.can(PERMS.workOrders);
+  const canValidate = me?.can(PERMS.validate);
   const onSave = (id?: string) => async (v: any) => {
     const values: any = { ...v };
     if (v.status === "in_progress") values.start_date = new Date().toISOString();
     if (v.status === "completed") values.end_date = new Date().toISOString();
     await save.mutateAsync({ id, values });
   };
+  /** Critical interventions (priority or machine criticality) require supervisor validation. */
+  const isCritical = (w: any) => ["critical", "high"].includes(w.priority) || ["critical", "high"].includes(w.equipment?.criticality);
+  const submitReport = (w: any) => async (v: any) => {
+    await save.mutateAsync({
+      id: w.id,
+      values: {
+        work_performed: v.work_performed, actual_hours: v.actual_hours, comments: v.comments,
+        status: isCritical(w) ? "awaiting_validation" : "completed",
+        submitted_at: new Date().toISOString(), end_date: new Date().toISOString(),
+      },
+    });
+  };
+  const validate = (w: any, ok: boolean) => async (v: any) => {
+    await save.mutateAsync({
+      id: w.id,
+      values: ok
+        ? { status: "validated", validation_comment: v.validation_comment, validated_by: me?.user.id, validated_at: new Date().toISOString() }
+        : { status: "in_progress", validation_comment: v.validation_comment },
+    });
+  };
+  const reportFields: Field[] = [
+    { name: "work_performed", label: "Work performed", type: "textarea", required: true },
+    { name: "actual_hours", label: "Actual duration (h)", type: "number", required: true },
+    { name: "comments", label: "Technician comments", type: "textarea" },
+  ];
+  const commentField: Field[] = [{ name: "validation_comment", label: "Supervisor comment", type: "textarea", required: true }];
   const counts = Object.fromEntries(WO_STATUS.map((s) => [s, (data ?? []).filter((w) => w.status === s).length]));
   const filtered = (data ?? []).filter((w) => (!status || w.status === status) && (!priority || w.priority === priority));
 
