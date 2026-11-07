@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Activity, AlertTriangle, BarChart3, Boxes, CalendarClock, ClipboardList, Cog, LayoutDashboard, LogOut, Menu, ShieldCheck, User, X } from "lucide-react";
+import { Activity, AlertTriangle, BarChart3, Boxes, CalendarClock, ClipboardList, Cog, LayoutDashboard, LogOut, Menu, ShieldCheck, TrendingDown, User, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Wordmark } from "@/components/brand";
 import { ROLE_LABELS, useMe } from "@/lib/auth";
@@ -27,6 +27,7 @@ const NAV = [
   { to: "/inventory", label: "Spare Parts", icon: Boxes },
   { to: "/predictive", label: "Predictive", icon: Activity },
   { to: "/reliability", label: "Reliability & AMDEC", icon: BarChart3 },
+  { to: "/pareto", label: "Pareto Analysis", icon: TrendingDown },
 ] as const;
 
 function Shell() {

@@ -111,8 +111,31 @@ function WorkOrders() {
           { key: "planned_date", label: "Planned" },
           { key: "hours", label: "Est/Act h", className: "tabular-nums", render: (r) => `${r.estimated_hours} / ${r.actual_hours}` },
           { key: "total_cost", label: "Total", className: "text-right tabular-nums", render: (r) => fmt.money(Number(r.total_cost)) },
-          { key: "status", label: "Status", render: (r) => <StatusBadge value={r.status} /> },
-          { key: "act", label: "", render: (r) => canEdit && <FormDialog title={`Edit ${r.number}`} fields={fields} initial={r} onSubmit={onSave(r.id)} trigger={<Button size="icon" variant="ghost" aria-label="Edit"><Pencil className="h-4 w-4" /></Button>} /> },
+          { key: "status", label: "Status", render: (r) => (
+            <div className="flex flex-col gap-1">
+              <StatusBadge value={r.status} />
+              {r.validation_comment && r.status !== "validated" && <span className="max-w-[180px] truncate text-[10px] text-warning" title={r.validation_comment}>↩ {r.validation_comment}</span>}
+            </div>
+          ) },
+          { key: "act", label: "", render: (r) => (
+            <div className="flex gap-1">
+              {canEdit && r.status === "in_progress" && (
+                <FormDialog title={`Submit report — ${r.number}`} fields={reportFields} initial={r} onSubmit={submitReport(r)}
+                  trigger={<Button size="sm" variant="outline" aria-label="Submit report"><Send className="h-3.5 w-3.5" />{isCritical(r) ? "Submit (validation)" : "Submit"}</Button>} />
+              )}
+              {canValidate && r.status === "awaiting_validation" && (
+                <>
+                  <FormDialog title={`Validate — ${r.number}`} fields={commentField} onSubmit={validate(r, true)}
+                    trigger={<Button size="sm" aria-label="Validate"><CheckCircle2 className="h-3.5 w-3.5" />Validate</Button>} />
+                  <FormDialog title={`Reject — ${r.number}`} fields={commentField} onSubmit={validate(r, false)}
+                    trigger={<Button size="sm" variant="destructive" aria-label="Reject"><XCircle className="h-3.5 w-3.5" />Reject</Button>} />
+                </>
+              )}
+              {canEdit && r.status !== "validated" && r.status !== "awaiting_validation" && (
+                <FormDialog title={`Edit ${r.number}`} fields={fields} initial={r} onSubmit={onSave(r.id)} trigger={<Button size="icon" variant="ghost" aria-label="Edit"><Pencil className="h-4 w-4" /></Button>} />
+              )}
+            </div>
+          ) },
         ]} />
     </div>
   );

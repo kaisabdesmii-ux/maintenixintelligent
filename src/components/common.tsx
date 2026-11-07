@@ -18,6 +18,7 @@ const TONES: Record<string, string> = {
   waiting_parts: "bg-warning/20 text-warning",
   waiting_for_parts: "bg-warning/20 text-warning",
   pending_approval: "bg-warning/20 text-warning",
+  awaiting_validation: "bg-warning/20 text-warning",
   medium: "bg-warning/20 text-warning",
   reported: "bg-warning/20 text-warning",
   draft: "bg-muted text-muted-foreground",
