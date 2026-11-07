@@ -2,8 +2,13 @@
 - [x] Auth, 8 roles, user/role admin, profile, password reset
 - [x] Dashboard KPIs & charts, equipment + detail, breakdowns, work orders, preventive, spare parts & stock, predictive, reliability/AMDEC
 - [x] Enterprise upgrade: dark industrial theme, top bar (global search, IoT status, notifications), OEE/active-WO/risk/MTTR-MTBF hero cards, live IoT telemetry simulation, AI insights + one-click AI work orders, equipment grid/floor-map toggle, WO urgency filter + PDF export
-- [ ] AI Center assistant (next)
-- [ ] Suppliers & purchasing
+- [x] Phase 3 critical modules: AMDEC/GOD (configurable thresholds, action status, rules-based action proposals), Pareto page (count/downtime, machine/type/cause, filters, 80% line, click-through, PDF), Weibull reliability curves per machine (β/η, real vs model, insufficient-data state), intervention validation workflow (submit report → awaiting validation → supervisor validate/reject with comment)
+- [ ] AI Center assistant (LLM via Lovable AI, hybrid AI provider layer) (next)
+- [ ] Notifications table + realtime supervisor alerts
+- [ ] Suppliers & purchasing (PO, receipts, validation)
+- [ ] Industrial reference catalog
 - [ ] Technicians/HR planning
 - [ ] Real OEE production counters (performance & quality are fixed assumptions for now)
+- [ ] Data-level translation cache (original text always preserved)
+- [ ] Audit log for sensitive operations
 - [ ] File attachments & images upload (storage), realtime updates
