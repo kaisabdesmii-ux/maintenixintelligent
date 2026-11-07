@@ -58,14 +58,14 @@ describe("pareto", () => {
   it("sorts descending with cumulative % reaching 100", () => {
     const p = pareto({ a: 10, b: 30, c: 20 });
     expect(p.map((r) => r.key)).toEqual(["b", "c", "a"]);
-    expect(p[0].pct).toBe(50);
-    expect(p[2].cum).toBe(100);
+    expect(p[0]!.pct).toBe(50);
+    expect(p[2]!.cum).toBe(100);
   });
   it("flags the minimal set reaching 80%", () => {
     const p = pareto({ a: 50, b: 30, c: 20 });
-    expect(p[0].in80).toBe(true);
-    expect(p[1].in80).toBe(true); // 50+30=80
-    expect(p[2].in80).toBe(false);
+    expect(p[0]!.in80).toBe(true);
+    expect(p[1]!.in80).toBe(true); // 50+30=80
+    expect(p[2]!.in80).toBe(false);
   });
   it("empty input gives empty result", () => {
     expect(pareto({})).toEqual([]);
