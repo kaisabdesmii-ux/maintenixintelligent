@@ -26,6 +26,7 @@ export const PERMS = {
   stockMove: ["warehouse_manager", "technician", "maintenance_manager"],
   sensors: ["maintenance_manager", "technician", "operator"],
   fmea: ["maintenance_manager"],
+  validate: ["maintenance_manager"],
 } satisfies Record<string, AppRole[]>;
 
 export function useMe() {
