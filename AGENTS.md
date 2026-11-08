@@ -16,3 +16,5 @@
 - KPI formulas (MTBF, MTTR, availability, RPN, risk score, OEE, health score) live in `src/lib/kpi.ts` with tests in `src/test/kpi.test.ts`.
 - Live sensor "streaming" is a client-side simulation (`useLiveTelemetry` in `src/lib/telemetry.ts`) drifting around the latest stored readings — never persist simulated values to the database.
 - The UI is dark-only industrial theme; all colors are tokens in `src/styles.css` (`glass`, `glow-*`, `pulse-dot` utilities). New UI strings must be added to the FR/AR dictionary in `src/lib/i18n.tsx`.
+- Weibull estimation (median-rank regression on times-between-failures) and Pareto computation live in `src/lib/weibull.ts` with tests in `src/test/kpi.test.ts`; Weibull output is always labeled "statistical model", never shown as measured data, and needs ≥3 intervals (else show the insufficient-data state).
+- Critical work orders (priority or machine criticality high/critical) follow submit → awaiting_validation → supervisor validate/reject; validated reports are not editable in the UI.
