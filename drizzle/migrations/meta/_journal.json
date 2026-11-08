@@ -22,6 +22,13 @@
       "when": 1793947445984,
       "tag": "0002_work_order_validation_and_fmea_action_status",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794096585275,
+      "tag": "0003_notifications_system",
+      "breakpoints": true
     }
   ]
 }

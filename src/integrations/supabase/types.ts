@@ -219,6 +219,48 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actor_name: string | null
+          created_at: string
+          description: string | null
+          equipment_id: string | null
+          id: string
+          link: string | null
+          priority: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          actor_name?: string | null
+          created_at?: string
+          description?: string | null
+          equipment_id?: string | null
+          id?: string
+          link?: string | null
+          priority?: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          actor_name?: string | null
+          created_at?: string
+          description?: string | null
+          equipment_id?: string | null
+          id?: string
+          link?: string | null
+          priority?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       preventive_plans: {
         Row: {
           active: boolean
@@ -575,6 +617,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      notify_supervisors: {
+        Args: {
+          _actor: string
+          _description: string
+          _equipment_id: string
+          _link: string
+          _priority: string
+          _title: string
+          _type: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
