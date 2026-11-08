@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Bell, Cpu, Search } from "lucide-react";
 import { useRows } from "@/lib/data";
-import { riskLevel, riskScore, stockState } from "@/lib/kpi";
+import { sortNotifications, useNotifications } from "@/lib/notifications";
 import { useLang } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -90,53 +90,52 @@ function IotStatus() {
   );
 }
 
+const PRIO_DOT: Record<string, string> = { critical: "bg-destructive", high: "bg-warning", medium: "bg-info", low: "bg-muted-foreground" };
+
 function NotificationBell() {
-  const eq = useRows("equipment");
-  const pp = useRows("preventive_plans");
-  const sp = useRows("spare_parts");
-  const sr = useRows("sensor_readings", { order: "recorded_at" });
+  const { data, markRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const { t } = useLang();
+  const navigate = useNavigate();
 
-  const alerts = useMemo(() => {
-    const latest = new Map<string, any>();
-    for (const r of sr.data ?? []) if (!latest.has(r.equipment_id) || latest.get(r.equipment_id).recorded_at < r.recorded_at) latest.set(r.equipment_id, r);
-    const today = new Date().toISOString().slice(0, 10);
-    return [
-      ...(eq.data ?? [])
-        .filter((e) => latest.get(e.id) && riskLevel(riskScore(latest.get(e.id))) === "high")
-        .map((e) => ({ tone: "text-destructive", text: `${e.name}: ${t("high predictive risk")}`, to: `/equipment/${e.id}` })),
-      ...(pp.data ?? []).filter((p) => p.active && p.next_due < today).map((p) => ({ tone: "text-warning", text: `${t("Preventive overdue")}: ${p.title}`, to: "/preventive" })),
-      ...(sp.data ?? []).filter((p) => stockState(p) !== "ok").map((p) => ({ tone: "text-warning", text: `${stockState(p) === "out" ? t("Out of stock") : t("Low stock")}: ${p.designation}`, to: "/inventory" })),
-    ];
-  }, [eq.data, pp.data, sp.data, sr.data, t]);
+  const unread = (data ?? []).filter((n) => !n.read_at).length;
+  const latest = sortNotifications(data ?? []).slice(0, 8);
 
   return (
     <div className="relative">
       <button onClick={() => setOpen(!open)} className="relative rounded-md border bg-secondary/60 p-2 hover:bg-accent" aria-label={t("Notifications")}>
         <Bell className="h-4 w-4" />
-        {alerts.length > 0 && (
+        {unread > 0 && (
           <span className="absolute -end-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 font-mono text-[10px] font-bold text-destructive-foreground">
-            {alerts.length}
+            {unread}
           </span>
         )}
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute end-0 top-11 z-50 w-80 overflow-hidden rounded-md border bg-popover shadow-xl">
-            <div className="border-b px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("Notifications")} ({alerts.length})</div>
-            <ul className="max-h-72 overflow-y-auto">
-              {alerts.length === 0 && <li className="px-3 py-6 text-center text-sm text-muted-foreground">{t("No active alerts.")}</li>}
-              {alerts.map((a, i) => (
-                <li key={i}>
-                  <Link to={a.to as any} onClick={() => setOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent">
-                    <span className={cn("inline-block h-2 w-2 shrink-0 rounded-full", a.tone.replace("text-", "bg-"))} />
-                    <span className="truncate">{a.text}</span>
-                  </Link>
+          <div className="absolute end-0 top-11 z-50 w-96 overflow-hidden rounded-md border bg-popover shadow-xl">
+            <div className="border-b px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("Notifications")} ({unread} {t("unread")})</div>
+            <ul className="max-h-80 overflow-y-auto">
+              {latest.length === 0 && <li className="px-3 py-6 text-center text-sm text-muted-foreground">{t("No notifications yet.")}</li>}
+              {latest.map((n) => (
+                <li key={n.id}>
+                  <button
+                    onClick={() => { setOpen(false); if (!n.read_at) markRead.mutate(n.id); if (n.link) navigate({ to: n.link as any }); }}
+                    className={cn("flex w-full items-start gap-2 px-3 py-2 text-start text-sm hover:bg-accent", !n.read_at && "bg-primary/5")}
+                  >
+                    <span className={cn("mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full", PRIO_DOT[n.priority] ?? PRIO_DOT.low)} />
+                    <span className="min-w-0 flex-1">
+                      <span className={cn("block truncate", !n.read_at && "font-semibold")}>{n.title}</span>
+                      <span className="block text-[11px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</span>
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
+            <Link to="/notifications" onClick={() => setOpen(false)} className="block border-t px-3 py-2 text-center text-xs font-medium text-primary hover:bg-accent">
+              {t("View all notifications")}
+            </Link>
           </div>
         </>
       )}

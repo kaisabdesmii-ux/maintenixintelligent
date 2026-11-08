@@ -201,6 +201,15 @@ const DICT: Record<string, { fr: string; ar: string }> = {
   "Work performed": { fr: "Travail effectué", ar: "العمل المنجز" },
   "Actual duration (h)": { fr: "Durée réelle (h)", ar: "المدة الفعلية (س)" },
   "Technician comments": { fr: "Commentaires du technicien", ar: "ملاحظات الفني" },
+  // Notifications
+  "Alerts triggered by real events: breakdowns, work order status, reports, validations, critical readings and stock.": { fr: "Alertes déclenchées par des événements réels : pannes, statuts d'OT, rapports, validations, mesures critiques et stock.", ar: "تنبيهات ناتجة عن أحداث حقيقية: أعطال، حالات أوامر العمل، تقارير، اعتمادات، قراءات حرجة ومخزون." },
+  "Mark all read": { fr: "Tout marquer lu", ar: "تعليم الكل كمقروء" },
+  "All priorities": { fr: "Toutes priorités", ar: "كل الأولويات" },
+  "Unread only": { fr: "Non lues", ar: "غير المقروءة" },
+  "unread": { fr: "non lues", ar: "غير مقروءة" },
+  "No notifications yet.": { fr: "Aucune notification pour le moment.", ar: "لا توجد إشعارات بعد." },
+  "No notifications yet. They appear when important events happen in the app.": { fr: "Aucune notification. Elles apparaissent lors d'événements importants dans l'application.", ar: "لا توجد إشعارات بعد. تظهر عند وقوع أحداث مهمة في التطبيق." },
+  "View all notifications": { fr: "Voir toutes les notifications", ar: "عرض كل الإشعارات" },
 };
 
 let current: Lang = "en";
