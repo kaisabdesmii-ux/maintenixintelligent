@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedBreakdownsRouteImport } from './routes/_authenticated/breakdowns'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedParetoRouteImport } from './routes/_authenticated/pareto'
 import { Route as AuthenticatedPredictiveRouteImport } from './routes/_authenticated/predictive'
 import { Route as AuthenticatedPreventiveRouteImport } from './routes/_authenticated/preventive'
@@ -60,6 +61,12 @@ const AuthenticatedInventoryRoute = AuthenticatedInventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedParetoRoute = AuthenticatedParetoRouteImport.update({
   id: '/pareto',
   path: '/pareto',
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/breakdowns': typeof AuthenticatedBreakdownsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/pareto': typeof AuthenticatedParetoRoute
   '/predictive': typeof AuthenticatedPredictiveRoute
   '/preventive': typeof AuthenticatedPreventiveRoute
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
   '/breakdowns': typeof AuthenticatedBreakdownsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/pareto': typeof AuthenticatedParetoRoute
   '/predictive': typeof AuthenticatedPredictiveRoute
   '/preventive': typeof AuthenticatedPreventiveRoute
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated/breakdowns': typeof AuthenticatedBreakdownsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/pareto': typeof AuthenticatedParetoRoute
   '/_authenticated/predictive': typeof AuthenticatedPredictiveRoute
   '/_authenticated/preventive': typeof AuthenticatedPreventiveRoute
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/breakdowns'
     | '/dashboard'
     | '/inventory'
+    | '/notifications'
     | '/pareto'
     | '/predictive'
     | '/preventive'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/breakdowns'
     | '/dashboard'
     | '/inventory'
+    | '/notifications'
     | '/pareto'
     | '/predictive'
     | '/preventive'
@@ -206,6 +218,7 @@ export interface FileRouteTypes {
     | '/_authenticated/breakdowns'
     | '/_authenticated/dashboard'
     | '/_authenticated/inventory'
+    | '/_authenticated/notifications'
     | '/_authenticated/pareto'
     | '/_authenticated/predictive'
     | '/_authenticated/preventive'
@@ -273,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/inventory'
       fullPath: '/inventory'
       preLoaderRoute: typeof AuthenticatedInventoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pareto': {
@@ -345,6 +365,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBreakdownsRoute: typeof AuthenticatedBreakdownsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedParetoRoute: typeof AuthenticatedParetoRoute
   AuthenticatedPredictiveRoute: typeof AuthenticatedPredictiveRoute
   AuthenticatedPreventiveRoute: typeof AuthenticatedPreventiveRoute
@@ -360,6 +381,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBreakdownsRoute: AuthenticatedBreakdownsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedParetoRoute: AuthenticatedParetoRoute,
   AuthenticatedPredictiveRoute: AuthenticatedPredictiveRoute,
   AuthenticatedPreventiveRoute: AuthenticatedPreventiveRoute,
