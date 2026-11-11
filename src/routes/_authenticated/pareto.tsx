@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Bar, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis, Cell } from "recharts";
-import { FileDown } from "lucide-react";
+import { FileDown, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Empty, PageHeader, Panel, StatusBadge } from "@/components/common";
 import { useRows } from "@/lib/data";
@@ -99,7 +99,7 @@ function ParetoPage() {
                 <YAxis yAxisId="b" orientation="right" domain={[0, 100]} fontSize={11} unit="%" />
                 <Tooltip {...tip} formatter={(v: any, name: any) => [name === "cum" ? v + "%" : metric === "downtime" ? v + " h" : v, name === "cum" ? t("Cumulative %") : metric === "count" ? t("Breakdowns") : t("Downtime (h)")]} />
                 <ReferenceLine yAxisId="b" y={80} stroke="var(--chart-4)" strokeDasharray="6 4" label={{ value: "80%", fill: "var(--chart-4)", fontSize: 11 }} />
-                <Bar yAxisId="a" dataKey="value" radius={[4, 4, 0, 0]} cursor="pointer">
+                <Bar yAxisId="a" dataKey="value" radius={[4, 4, 0, 0]} cursor="pointer" onClick={(p: any) => p?.key && setSelected(p.key)}>
                   {d.rowsP.map((r, i) => <Cell key={i} fill={r.in80 ? "var(--chart-5)" : "var(--chart-1)"} opacity={selected && selected !== r.key ? 0.35 : 1} />)}
                 </Bar>
                 <Line yAxisId="b" dataKey="cum" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 3 }} />
@@ -120,16 +120,18 @@ function ParetoPage() {
                 </tbody>
               </table></div>
             </Panel>
-            <Panel title={selected ? `${t("Breakdowns")} — ${selected}` : t("Breakdowns")}>
+            <Panel title={selected ? `${t("Breakdowns")} — ${selected}` : t("Breakdowns")} action={selected && (dim === "machine" && matching[0]?.equipment_id
+              ? <Button asChild size="sm" variant="outline"><Link to="/equipment/$id" params={{ id: matching[0].equipment_id }}><ExternalLink className="h-4 w-4" />{t("Open equipment sheet")}</Link></Button>
+              : <Button asChild size="sm" variant="outline"><Link to="/breakdowns"><ExternalLink className="h-4 w-4" />{t("Open breakdowns")}</Link></Button>)}>
               {!selected ? <Empty text="Click a bar or a row to see the matching breakdowns." /> : (
                 <ul className="max-h-[320px] divide-y overflow-y-auto">
                   {matching.map((b) => (
-                    <li key={b.id} className="flex items-center gap-3 py-2 text-sm">
+                    <li key={b.id}><Link to="/equipment/$id" params={{ id: b.equipment_id }} className="flex items-center gap-3 rounded py-2 text-sm hover:bg-muted/40">
                       <span className="w-20 shrink-0 font-mono text-xs text-primary">{b.reference}</span>
                       <span className="flex-1 truncate">{b.description}</span>
                       <span className="text-xs text-muted-foreground">{fmt.num(Number(b.downtime_hours), 1)} h</span>
                       <StatusBadge value={b.status} />
-                    </li>
+                    </Link></li>
                   ))}
                 </ul>
               )}

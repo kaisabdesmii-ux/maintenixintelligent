@@ -166,6 +166,8 @@ const DICT: Record<string, { fr: string; ar: string }> = {
   "Count": { fr: "Nombre", ar: "العدد" },
   "Downtime": { fr: "Arrêt", ar: "التوقف" },
   "Cum. %": { fr: "% cum.", ar: "٪ تراكمي" },
+  "Open equipment sheet": { fr: "Ouvrir la fiche équipement", ar: "فتح بطاقة المعدة" },
+  "Open breakdowns": { fr: "Ouvrir les pannes", ar: "فتح الأعطال" },
   "Click a bar or a row to see the matching breakdowns.": { fr: "Cliquez sur une barre ou une ligne pour voir les pannes correspondantes.", ar: "انقر على عمود أو صف لعرض الأعطال المطابقة." },
   "No breakdown data for this selection. Pareto requires real recorded events.": { fr: "Aucune panne pour cette sélection. Le Pareto exige des événements réels enregistrés.", ar: "لا توجد بيانات أعطال لهذا الاختيار. يتطلب باريتو أحداثًا حقيقية مسجلة." },
   "GOD = G × O × D (1-10 each). A high D means the failure is hard to detect.": { fr: "GOD = G × O × D (1-10 chacun). Un D élevé signifie une défaillance difficile à détecter.", ar: "GOD = G × O × D (1-10 لكل منها). D مرتفع يعني عطلًا يصعب اكتشافه." },
