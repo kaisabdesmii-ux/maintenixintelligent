@@ -80,7 +80,7 @@ function NotificationsPage() {
             return (
               <li key={n.id}>
                 <button onClick={() => open(n)} className={cn("flex w-full items-start gap-3 px-4 py-3 text-start hover:bg-muted/40", !n.read_at && "bg-primary/5")}>
-                  <span className={cn("mt-0.5 rounded-md p-1.5", PRIO_CLS[n.priority] ?? PRIO_CLS.low)}><Icon className="h-4 w-4" /></span>
+                  <span className={cn("mt-0.5 rounded-md p-1.5", PRIO_CLS[n.priority] ?? PRIO_CLS["low"])}><Icon className="h-4 w-4" /></span>
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2">
                       <span className={cn("truncate text-sm", !n.read_at && "font-semibold")}>{n.title}</span>
@@ -93,7 +93,7 @@ function NotificationsPage() {
                       <span className="font-mono uppercase">{n.type.replace(/_/g, " ")}</span>
                     </span>
                   </span>
-                  <span className={cn("shrink-0 rounded px-2 py-0.5 font-mono text-[10px] uppercase", PRIO_CLS[n.priority] ?? PRIO_CLS.low)}>{t(n.priority)}</span>
+                  <span className={cn("shrink-0 rounded px-2 py-0.5 font-mono text-[10px] uppercase", PRIO_CLS[n.priority] ?? PRIO_CLS["low"])}>{t(n.priority)}</span>
                 </button>
               </li>
             );

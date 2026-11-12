@@ -124,7 +124,7 @@ function NotificationBell() {
                     onClick={() => { setOpen(false); if (!n.read_at) markRead.mutate(n.id); if (n.link) navigate({ to: n.link as any }); }}
                     className={cn("flex w-full items-start gap-2 px-3 py-2 text-start text-sm hover:bg-accent", !n.read_at && "bg-primary/5")}
                   >
-                    <span className={cn("mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full", PRIO_DOT[n.priority] ?? PRIO_DOT.low)} />
+                    <span className={cn("mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full", PRIO_DOT[n.priority] ?? PRIO_DOT["low"])} />
                     <span className="min-w-0 flex-1">
                       <span className={cn("block truncate", !n.read_at && "font-semibold")}>{n.title}</span>
                       <span className="block text-[11px] text-muted-foreground">{new Date(n.created_at).toLocaleString()}</span>
